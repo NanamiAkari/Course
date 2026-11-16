@@ -1,0 +1,7 @@
+interface:
+  display_name: "海光课程讲义"
+  short_description: "海光专项讲义：先对齐、固定骨架（目标/理论/实训/硬件/视频）、穷尽资料、修订不覆盖手改"
+  default_prompt: "Use $haiguang-course-handout to align with me first, then turn these 海光 course materials into a handout and export the requested DOCX."
+
+policy:
+  allow_implicit_invocation: true

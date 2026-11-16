@@ -1,0 +1,8 @@
+# Noto CJK 字体（约 55 MB，OFL 许可）不入库：只有讲义显式指定字体族时才用到，
+# 需要时把 NotoSansCJKsc-Regular.otf / NotoSansCJKsc-Bold.otf / NotoSerifCJKsc-Regular.otf
+# 放回 assets/ 即可。许可正文见 assets/OFL.txt。
+*.otf
+*.ttf
+*.ttc
+__pycache__/
+.DS_Store
