@@ -21,11 +21,13 @@ def validate_md(path: Path) -> list[str]:
     if not lines or not any(re.match(r"^#\s+\S", line) for line in lines): errors.append("missing level-1 title")
     if not re.search(r"(?i)(学习目标|learning objectives|objectives)", text): errors.append("missing learning objectives")
     if not re.search(r"(?i)(练习|自测|随堂思考|exercise|self-test)", text): errors.append("missing learner practice or self-test")
-    # A sources section is optional. What is not optional is provenance for the
-    # numbers and figures copied from external material, so this is a reminder.
-    if not re.search(r"(?i)(来源|参考|source|reference)", text):
-        WARNINGS.append("no sources section: give every external figure and number a provenance note "
-                        "(table note, figure caption, or a sources list)")
+    if text.startswith("---\n"):
+        fm_end = text.find("\n---\n", 4)
+        if fm_end != -1:
+            fm_block = text[4:fm_end]
+            for banned_key in ("subtitle:", "audience:", "duration:"):
+                if any(ln.strip().startswith(banned_key) for ln in fm_block.splitlines()):
+                    errors.append(f"frontmatter contains forbidden header bar key: {banned_key[:-1]} (开篇不保留元信息副标题条)")
     captions: list[str] = []
     for match in re.finditer(r"!\[([^]]*)\]\(([^)]+)\)", text):
         caption, value = match.group(1).strip(), match.group(2).strip()
@@ -60,6 +62,7 @@ def validate_md(path: Path) -> list[str]:
     errors += table_shape_errors(lines)
     errors += meta_phrase_errors(text)
     WARNINGS.extend(quote_warnings(text))
+    WARNINGS.extend(ai_tone_warnings(text))
     errors += citation_errors(re.sub(r"`[^`]*`", "", text))
     return errors
 
@@ -150,14 +153,34 @@ def quote_warnings(text: str) -> list[str]:
     return []
 
 
+AI_TONE_WORDS = re.compile(
+    r"门禁|消缺|临门一脚|打回整改|翻车场景|幽灵资产|微状态|算力积木|拧成一股绳|彻底消灭|严禁走形式"
+)
+
+
+def ai_tone_warnings(text: str) -> list[str]:
+    body = text
+    if body.startswith("---"):
+        parts = body.split("---", 2)
+        if len(parts) == 3:
+            body = parts[2]
+    body = re.sub(r"`[^`]*`", "", body)
+    found = sorted(set(AI_TONE_WORDS.findall(body)))
+    if found:
+        return [f"正文出现生硬 AI 腔或防御性套话：{'、'.join(found)}（建议改用平实工程用语）"]
+    return []
+
+
 # The handout must not talk about itself: no provenance in body text, no
 # "this lesson does not cover X", no disclaimers. Those sentences are the
 # model protecting itself, not information for the reader.
 META_PATTERNS = (
-    (re.compile(r"(本节|本讲|本文|本课)内容?(出自|来自|取材)"), "出处写进了正文，应放图注、表注或来源节"),
+    (re.compile(r"(本节|本讲|本文|本课)内容?(出自|来自|取材)"), "出处写进了正文，应完全删除并在内稿 outline.md 留痕"),
     (re.compile(r"(本节|本讲)(不|只|仅|不再)"), "用否定句划范围，应写成正面条件或整句删掉"),
     (re.compile(r"不在(本节|本讲)|不属于本讲|超出本讲"), "反指本讲范围，应整句删掉"),
     (re.compile(r"为避免误解|需要说明的是|需要强调的是|严格来说|限于篇幅|不再赘述"), "免责套话，应整句删掉"),
+    (re.compile(r"源自[《第\w]|整理自|引述自|依据《|资料来源|文档编号\s*6W111|6W111-\d+|培训材料原图|海光官方培训资料|用户指南》"), "讲义正文/图注/表注/文末不得出现出处与文档编号标注（仅记入 outline.md）"),
+    (re.compile(r"零基础社会学习者（海光芯片|《智慧算力运维工程师》·\s*海光专项\s*·\s*课程讲义"), "禁止在讲义开篇保留题眉元信息副标题条"),
 )
 
 

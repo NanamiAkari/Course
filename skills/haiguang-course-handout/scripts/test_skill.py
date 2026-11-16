@@ -16,7 +16,6 @@ ENV = dict(os.environ, PYTHONIOENCODING="utf-8")
 
 LESSON = """---
 title: 测试讲义
-subtitle: 最小可验证样例
 ---
 # 测试讲义
 
@@ -71,10 +70,6 @@ subtitle: 最小可验证样例
 | 说清两个指标 | 能比较 |
 
 【课后自测】写出一个判断条件。
-
-## 1.7、来源
-
-课程资料。
 """
 
 
@@ -137,18 +132,19 @@ def main() -> int:
         if (h2.paragraph_format.space_before.pt != 14) or (h2.paragraph_format.space_after.pt != 8):
             raise AssertionError("level-2 heading spacing must be 14 pt before / 8 pt after")
 
-        # A sources section is optional: the source-free copy must still validate,
-        # and the validator must say why it is worth adding one.
-        loose = work / "no-sources"
-        loose.mkdir()
-        loose_source = loose / "lesson.md"
-        loose_source.write_text(LESSON.split("## 1.7、来源")[0], encoding="utf-8")
-        build(loose_source, loose / "out", "md")
-        result = validate(loose / "out" / "lesson.md")
-        if result.returncode != 0:
-            raise AssertionError(f"a handout without a sources section must still pass: {result.stdout}")
-        if "warning:" not in result.stdout:
-            raise AssertionError("the missing sources section should produce a warning")
+        # Provenance & header-bar leaks must fail validation.
+        leak_cases = {
+            "header-bar": ("---\n# 测试讲义", "subtitle: 《智慧算力运维工程师》· 海光专项 · 课程讲义\n---\n# 测试讲义"),
+            "provenance-note": ("表1-1、两个指标的对比", "表1-1、两个指标的对比（源自《H3C UniServer R4930 G7 用户指南》，6W111-20260730）"),
+        }
+        for name, (old_s, new_s) in leak_cases.items():
+            leak_dir = work / name
+            leak_dir.mkdir()
+            leak_source = leak_dir / "lesson.md"
+            leak_source.write_text(LESSON.replace(old_s, new_s), encoding="utf-8")
+            result = validate(leak_source)
+            if result.returncode == 0:
+                raise AssertionError(f"forbidden {name} must fail validation: {result.stdout}")
 
         # The skeleton is enforced: a lesson without a practice block is rejected.
         broken = work / "no-practice"

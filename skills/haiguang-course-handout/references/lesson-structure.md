@@ -6,7 +6,7 @@
 
 | 节 | 必须 | 职责 |
 | --- | --- | --- |
-| `N.1、学习目标` | 是 | 知识目标、实操目标两组；每条目标可判定 |
+| `N.1、学习目标` | 是 | 采用 41/42 圆点模板：`学完本讲，你应当能够：` + `了解……`（3–4 条） + `实训完成“……”的闭环`（1–2 条）；达成标志放 `N.6.1` |
 | `N.2、<理论节名>` | 是，至少一节 | 全部知识内容；术语表是本节最后一小节 |
 | `N.3、具体实训内容` | 是 | 全部动手任务；一个任务一张步骤表 |
 | `N.4、需要的硬件设施` | 是 | 工位要备的件与工具 |
@@ -75,18 +75,17 @@
 - 回看表：`学习目标 / 应能做出的判断`，可选一列`对应实训`（写 `N.3.x`）。
 - 自测 3～5 题，问判断不问名词。
 - 参考答案与解析放在本节最后，按"随堂思考"与"课后自测"分组。
-- 写完解析就收尾，**不写「下一讲…」这类跨讲衔接句**。学员手上只有这一讲，衔接句对他没有用，还容易把讲次编号说错。
+- 与下一讲的衔接一句话，写在解析之后。
 
-## 七、不写的话（meta 与防御性话术）
+## 七、不写的话与去 AI 味规则
 
-讲义是给学员看的成品，不是给自己看的说明。凡是**关于这份文档自身**的句子，一律不写。四类，逐类给反例和改法：
+讲义是给学员看的成品，不是给自己看的说明，也不是凑字数的散文。凡是**关于这份文档自身**、**替作者叠甲**以及**AI 腔浓重的废话**，一律删改。四类，逐类给反例和改法：
 
-### 1. 出处不进正文
+### 1. 出处不进交付讲义（含正文、图注、图片画面、表注与文末）
 
-- 反例：`本节内容出自《H3C UniServer R4930 G7 用户指南》。` `本讲取材于厂商培训材料。`
-- 出处放两处：**文末「来源」节**（首选）或**表注**（表题下或末列）。
-- **图注与表题里不写来源括注**。不要写「（H3C iFIST 配置指导图3-19）」「（海光培训材料原图）」这类尾巴——图注只描述画面内容与编号对应关系，一行说完。
-- 正文里出现"据××""出自××""取材于××"，说明你还没把事实融进讲解。
+- 反例：`本节内容出自《H3C UniServer R4930 G7 用户指南》。` `（源自《H3C UniServer R4930 G7 用户指南》，6W111-20260730）` `（海光培训材料原图）` `### N.6.3、资料来源`。
+- 正文、图注、配图内副标题、表注以及文末**全部不保留**出处注释、文档编号、原图出处字样或独立的`资料来源`小节。
+- 素材与文档编号溯源统一留在工作目录 `outline.md` 中内部留痕，不印入任何学员可见讲义。
 
 ### 2. 范围不靠否定句划
 
@@ -97,20 +96,20 @@
   - ✗ `本讲不测接地电阻、不测腐蚀性气体，那些放到下一讲的机房部分。`
   - ✓ `接地电阻与腐蚀性气体由机房环节检测。`
 
-### 3. 不写跨讲衔接
+### 3. 不做免责声明与防御性宣讲
 
-- 反例：`下一讲进软件栈：驱动、DTK、DAS 与光合社区…` `本讲的内容为第 46 讲做铺垫`。
-- 讲义自成一讲：讲到哪儿就在哪儿收尾。讲次先后、课程地图属于教学大纲与开场口径，不放在正文结尾。
-- `validate_handout.py` 会对「下一讲」这类字样告警。
+- 反例：`为避免误解` `需要说明的是` `需要强调的是` `严格来说` `限于篇幅` `不再赘述` `彻底消灭幽灵资产，确保精准落表` `守住职业运维准则` `严禁走形式提前签字投产`。
+- 这些话的作用是替作者兜底或表态度，不是帮学员干活。表格“后果/用途”列只写具体技术或业务后果（如“单路掉电整机断电”），红线只写触发条件（如“命中任一项暂不签字，处理完再交接”），不写空洞口号。
 
-### 4. 不做免责声明
+### 4. 清理 AI 腔高频词、伪问题与顺口溜（重核心、轻琐事）
 
-- 反例：`为避免误解` `需要说明的是` `需要强调的是` `严格来说` `限于篇幅` `不再赘述`。
-- 这些话的作用是替作者兜底，不是帮学员理解。删掉之后句子通常更清楚；如果删不掉，说明那句话本身没说完。
+- **禁词替换**：不出现 `门禁`（改“第一步/首项核查”）、`消缺`（改“补齐/处理”）、`打回整改`（改“退回重做/处理后重核”）、`翻车场景`（改“常见问题”）、`临门一脚`、`拧成一股绳`、`桌面上`、`实物/机器/账面真源`、`零时刻微状态`、`算力积木`；正文也少用 `闭环`（除 `N.1` 固定句式外改用“完成/核对完毕/收齐”）。
+- **砍掉伪问题与顺口溜**：删掉“很多新手会问：为什么……”“如果在微信里说张三用前两张……”这类 AI 脑补引入，删掉“先……再……重……交……”这类强行押韵的小结口诀。
+- **重硬菜、轻琐事**：常规物理检查（拧螺丝、绕魔术贴、贴标签、盖挡板）**两句话 + 一张紧凑表一笔带过**，不在导语、`N.2`、`N.3`、`N.6` 重复铺陈；把主要篇幅留给架构机制、参数陷阱、隔离边界与实测验证。
 
-一句话记法：**把"我不做什么"改成"你照着做什么"；改不动的，整句删掉。**
+一句话记法：**把"我不做什么/口号是什么"改成"你照着做什么、错了出什么现象"；简单常识一表带过，核心硬菜讲透。**
 
-不算违规的句子：`本讲是海光专项的第一讲`、`学完本讲，你应当能够`、`表N-10、本讲涉及的术语`、`这一部分讲五件事：…`——这些是在讲课程内容，不是在解释文档。
+不算违规的句子：`本讲是海光专项的第一讲`、`学完本讲，你应当能够`、`表N-10、本讲涉及的术语`、`这一部分讲五件事：…`——这些是在讲课程内容，不是在解释文档或凑字数。
 
 ## 八、内容检查
 
@@ -121,23 +120,22 @@
 - For operational topics, connect each task to the observation or decision it enables.
 - If the source material is incomplete, write a bounded question or verification step rather than filling the gap with a guess.
 - When the source is a vendor deck or a training video, keep its original figures and add a re-typeset table beside them; the two serve different later uses (reading now, slides and video later). Do not replace one with the other.
-- Every number, table, and figure copied from external material carries its provenance in the sources section (preferred) or a table note — never as a parenthetical inside a figure caption or table title.
+- Every numeric threshold and vendor constraint must remain accurate and aligned with internal traceability in `outline.md`, without printing provenance footnotes (`源自…`, document IDs, or a visible `资料来源` section) in the student handout.
 - Objectives and the recap table use the same wording; a mismatch between them is a defect, not a style choice.
 
 ## 九、Suggested Markdown metadata
 
 ```yaml
 ---
-title: 第2讲 认识算力
-subtitle: 算力类型与资源来源
-audience: 算力运维工程师入门
-duration: 45 分钟
-chapter: 第一章 岗位认知与算力入门
+title: 第46讲 海光软件栈生态与光合开发者社区介绍
 course: 算力运维工程师
+chapter: 海光专项
+heading_font: 黑体
+body_font: 宋体
 ---
 ```
 
-Optional `heading_font` and `body_font` change only the typefaces (for example `黑体` and `宋体`); sizes and weights stay fixed by the style contract. Metadata is optional, but `title` should be present for exported documents. `title` becomes the running footer, `course` and `chapter` become the running header (`课程名  /  章名`, with `course` defaulting to `算力运维工程师`), and `subtitle`, `audience`, `duration` share the subtitle line under the title. Leave all three out when the lesson opens straight into its own introduction. The builder ignores unknown fields so a project may add version or author metadata.
+Optional `heading_font` and `body_font` change only the typefaces (for example `黑体` and `宋体`); sizes and weights stay fixed by the style contract. **Do not include `subtitle`, `audience`, or `duration`** under the title — open straight into the lesson introduction/objectives. `title` becomes the running footer, `course` and `chapter` become the running header (`课程名  /  章名`).
 
 ## 十、Chinese numbering and labels
 

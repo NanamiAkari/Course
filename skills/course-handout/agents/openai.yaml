@@ -1,0 +1,7 @@
+interface:
+  display_name: "Course Handout"
+  short_description: "把课程内容整理成可编辑讲义并导出多种格式"
+  default_prompt: "Use $course-handout to turn these lesson materials into a polished Markdown handout and export the requested DOCX or PDF."
+
+policy:
+  allow_implicit_invocation: true
