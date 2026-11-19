@@ -127,6 +127,23 @@ def strip_citations(line: str) -> str:
     return "".join(p if p.startswith("`") else _CITE_INLINE.sub("", p) for p in parts)
 
 
+def strip_citations_document(lines: list[str]) -> list[str]:
+    """Strip citations line by line, skipping fenced code blocks.
+
+    A code block is literal text: `sys.argv[1]` or `{.items[0].name}` is a
+    subscript, not a citation marker, so the fence must protect it.
+    """
+    out: list[str] = []
+    in_code = False
+    for line in lines:
+        if line.strip().startswith("```"):
+            in_code = not in_code
+            out.append(line)
+            continue
+        out.append(line if in_code else strip_citations(line))
+    return out
+
+
 def split_table_row(line: str) -> list[str]:
     line = line.strip().strip("|")
     return [cell.strip() for cell in line.split("|")]
@@ -140,7 +157,7 @@ def is_table_separator(line: str) -> bool:
 def parse_markdown(source: Path) -> tuple[dict[str, str], list[Block]]:
     lines = source.read_text(encoding="utf-8").splitlines()
     meta, lines = parse_frontmatter(lines)
-    lines = [strip_citations(x) for x in lines]
+    lines = strip_citations_document(lines)
     blocks: list[Block] = []
     paragraph: list[str] = []
 
@@ -1072,7 +1089,7 @@ def main() -> int:
         raw = source.read_text(encoding="utf-8").splitlines()
         _, body = parse_frontmatter(raw)
         head = raw[: len(raw) - len(body)]
-        cleaned = head + [strip_citations(x) for x in body]
+        cleaned = head + strip_citations_document(body)
         md_out = out_dir / source.name
         if md_out.resolve() == source:
             raise SystemExit("--out-dir must differ from the source directory; the source Markdown would be overwritten")
