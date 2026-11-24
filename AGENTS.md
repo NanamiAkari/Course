@@ -331,3 +331,29 @@
   3. **正则 `[0-9]` 误触发数字角标报错**：`validate_handout.py` 严查 `[1]` 类角标，正文及非反引号文本避免写形如 `[0-9]` 的数字方括号，Shell 数字匹配统一写 `[[:digit:]]`。
   4. **窄列英文长词被折断**：构建出 `.pdf` 后，用 `fitz` 提取文本或转 PNG 抽查表格首列，若 `CreateContainerConfigError`、`initialDelaySeconds` 等长词被拦腰截断，将首列改为简短中文名、把长英文标识符移入右侧宽列或表下正文。
   5. **自绘图文字过多过小**：把每张自绘图按 50% 缩略目检，凡标注超过 8 处、单处超过 8 字、出现整句说明或缩略后看不清，即判不合格——删字、改表格，或换实物照片/官方截图；宁可少一张图，不交一张“字满为患”的图。
+
+---
+
+### 4.6 工作区级 GPT-SoVITS 语音合成 MCP 工具（四智能体通用）
+
+- **作用与生效范围**：本工作区已通过 Mirasim 注册工作区级 MCP 服务 `gpt-sovits`（基于开源 `Ccccr231/gpt-soviuts-mcp` 适配增强，对接标准 GPT-SoVITS `api_v2.py`）。在本工作区通过 Mirasim 启动 **Claude Code、Codex、Antigravity、DSH** 对话会话时，均可直接调用该 MCP 工具集（例如为课程讲义、口播稿或 PPT 课件生成单段/多段对话配音）。
+- **已暴露的 6 个 MCP 工具**：
+  - `get_tts_status`：探测上游 GPT-SoVITS `api_v2.py` 连通性与 `/tts` OpenAPI 字段兼容性（无副作用，建议调用前先查）。
+  - `list_voices`：列出已配置音色、情绪挡位、参考音频来源（`local` / `remote`）与可用性状态。
+  - `synthesize_speech`：单段语音合成（支持 `text`、`voice_id`、`text_lang`、`emotion`、`intensity`、`speed`、`output_format`），返回 `resource_uri` 与本地音频 `file_path`。
+  - `synthesize_dialogue`：多段对话顺序合成并无损拼接为单个 WAV，返回总时长与每段起止时间（适合双人/多角色讲解配音）。
+  - `set_emotion`：生成 1 小时有效的情绪预设 ID（`emotion_preset`），便于多轮合成复用语气配置。
+  - `set_model_weights`：动态切换上游 GPT（`.ckpt`）和/或 SoVITS（`.pth`）模型权重（调用 `/set_gpt_weights` 与 `/set_sovits_weights`）。
+- **本机安装位置与配置文件**（已加入本机 `.git/info/exclude`，不污染协作仓库）：
+  - 插件目录：`.tools/gpt-sovits-mcp/`（虚拟环境 `.venv/`、生成音频输出 `outputs/`、参考音频 `references/`）。
+  - 核心配置：`.tools/gpt-sovits-mcp/config.local.toml`（默认指向 `http://127.0.0.1:9880`，预设 `default` 讲师音色）。
+  - 服务地址快捷修改：可直接在 Mirasim 扩展设置中修改 `gpt-sovits` 的环境变量 `GPT_SOVITS_API_URL`（优先级高于 TOML），或直接编辑 `config.local.toml` 的 `[backend].url`。
+- **本机推理服务（已部署并启用 Apple MPS 加速）**：
+  - 安装路径：`~/.local/share/GPT-SoVITS/`（避开网盘同步目录，使用独立 Python 3.11 `.venv`，已内置 GPT-SoVITS v2 权重、Chinese-RoBERTa、Chinese-HuBERT、G2PWModel、NLTK 与 fast-langdetect 缓存）。
+  - 一键启动：`~/.local/share/GPT-SoVITS/start_api.sh`（默认监听 `http://127.0.0.1:9880`，配置为 `GPT_SoVITS/configs/tts_infer_mac.yaml`，`device: mps`、`is_half: false`）。
+  - 一键停止：`~/.local/share/GPT-SoVITS/stop_api.sh`；运行日志：`~/.local/share/GPT-SoVITS/api_v2.log`。
+- **接入或切换音色/服务步骤**：
+  1. **本机默认试音 / 自定义音色**：已预置 7.5 秒中文示范音频 `.tools/gpt-sovits-mcp/references/default/neutral.wav` 及转写文本；如需克隆自定义音色，替换为 3–10 秒干净单人录音并更新 `config.local.toml` 中的 `prompt_text` 即可（也可新增 `[voices.<id>]` 多音色）。
+  2. **切换至远程 GPU 服务**：将 `GPT_SOVITS_API_URL`（或 `[backend].url`）改为远程地址（如 `http://<GPU机IP>:9880`），并在 `config.local.toml` 的音色条目中设置 `remote_audio = "/远程机器上的参考音频绝对路径.wav"` 及准确 `prompt_text`。
+  3. **联调验证**：在任意智能体对话中先调用 `get_tts_status` 确认 `reachable: true`、`api_compatible: true`，再调 `list_voices` 确认音色 `available: true`，即可调用 `synthesize_speech` 或 `synthesize_dialogue` 生成音频。
+
